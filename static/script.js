@@ -1,5 +1,8 @@
 (() => {
   // ── Elements ──
+  const apiKeyEl      = document.getElementById('api-key');
+  const btnSetKey     = document.getElementById('btn-set-key');
+  const keyStatus     = document.getElementById('key-status');
   const briefEl       = document.getElementById('brief');
   const brandUrlEl    = document.getElementById('brand-url');
   const btnExtract    = document.getElementById('btn-extract');
@@ -38,6 +41,31 @@
     });
     swatchesEl.classList.toggle('hidden', colors.length === 0);
   }
+
+  // ── Save API key ──
+  async function saveApiKey() {
+    const key = apiKeyEl.value.trim();
+    if (!key) { setStatus(keyStatus, 'Please enter an API key.', 'error'); return; }
+    btnSetKey.disabled = true;
+    try {
+      const res = await fetch('/api/set-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setStatus(keyStatus, 'API key saved for this session.', 'success');
+      apiKeyEl.value = '••••••••••••••••';
+    } catch (err) {
+      setStatus(keyStatus, `Error: ${err.message}`, 'error');
+    } finally {
+      btnSetKey.disabled = false;
+    }
+  }
+
+  btnSetKey.addEventListener('click', saveApiKey);
+  apiKeyEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); } });
 
   // ── Extract colours ──
   async function extractColors() {

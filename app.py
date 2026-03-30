@@ -12,7 +12,13 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
+# Key can be supplied at runtime via the /api/set-key endpoint (stored in memory only)
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+_runtime_api_key: str = ""
+
+
+def get_api_key() -> str:
+    return _runtime_api_key or ANTHROPIC_API_KEY
 
 # ---------------------------------------------------------------------------
 # Colour extraction
@@ -157,7 +163,7 @@ Rules:
 """
 
 def generate_email(brief: str, brand_colors: dict, brand_url: str = "") -> str:
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    client = anthropic.Anthropic(api_key=get_api_key())
 
     color_context = ""
     if brand_colors.get("named"):
@@ -212,9 +218,20 @@ def api_extract_colors():
     return jsonify(result)
 
 
+@app.route("/api/set-key", methods=["POST"])
+def api_set_key():
+    global _runtime_api_key
+    data = request.get_json(force=True)
+    key = data.get("key", "").strip()
+    if not key:
+        return jsonify({"error": "No key provided"}), 400
+    _runtime_api_key = key
+    return jsonify({"ok": True})
+
+
 @app.route("/api/generate", methods=["POST"])
 def api_generate():
-    if not ANTHROPIC_API_KEY:
+    if not get_api_key():
         return jsonify({"error": "ANTHROPIC_API_KEY environment variable not set"}), 500
 
     data = request.get_json(force=True)

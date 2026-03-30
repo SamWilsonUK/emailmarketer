@@ -21,6 +21,26 @@
         <h1 class="sidebar__title">Email Designer</h1>
       </header>
 
+      <!-- API Key -->
+      <section class="step" id="step-key">
+        <div class="step__label">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18" style="color:#6366f1"><path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"/></svg>
+          Anthropic API Key
+        </div>
+        <div class="url-row">
+          <input
+            id="api-key"
+            class="input input--inline"
+            type="password"
+            placeholder="sk-ant-…"
+            autocomplete="off"
+          />
+          <button id="btn-set-key" class="btn btn--ghost">Save</button>
+        </div>
+        <div id="key-status" class="color-status hidden"></div>
+        <p style="font-size:11px;color:#94a3b8;margin-top:4px;">Stored in memory only — not saved to disk. Get a key at <strong>console.anthropic.com</strong></p>
+      </section>
+
       <!-- Step 1: Brief -->
       <section class="step" id="step-brief">
         <div class="step__label"><span class="step__num">1</span> Marketing Brief</div>
